@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: generate
+    description: AI copy generation operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /generate/description:
+    post:
+      operationId: generateDescription
+      tags: [generate]
+      summary: Generate cocktail menu description
+      description: Uses Claude to generate an irresistible cocktail description from ingredients and tone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DescriptionInput"
+      responses:
+        "200":
+          description: Generated description
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DescriptionResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +66,32 @@ components:
           type: string
       required:
         - status
-
+    DescriptionInput:
+      type: object
+      required:
+        - ingredients
+        - tone
+      properties:
+        ingredients:
+          type: string
+          description: The cocktail ingredients list
+          minLength: 1
+        tone:
+          type: string
+          enum: [Luxurious, Playful, Minimalist]
+          description: The writing tone for the description
+    DescriptionResult:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+          type: string
+          description: The AI-generated cocktail description
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
