@@ -36,16 +36,23 @@ export async function fetchSaved(): Promise<SavedDescription[]> {
   return data ?? [];
 }
 
+function throwSupabaseError(error: { message?: string; details?: string; hint?: string; code?: string }): never {
+  const msg = error.message || error.details || error.code || "Unknown Supabase error";
+  console.error("[Supabase error]", JSON.stringify(error));
+  throw new Error(msg);
+}
+
 export async function saveDescription(
   entry: Omit<SavedDescription, "id" | "created_at">
 ): Promise<SavedDescription> {
   const client = await getClient();
+  // Insert without .select() first, then fetch separately if needed
   const { data, error } = await client
     .from("saved_descriptions")
     .insert([entry])
-    .select()
+    .select("*")
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throwSupabaseError(error);
   return data;
 }
 
@@ -55,5 +62,5 @@ export async function deleteDescription(id: number): Promise<void> {
     .from("saved_descriptions")
     .delete()
     .eq("id", id);
-  if (error) throw new Error(error.message);
+  if (error) throwSupabaseError(error);
 }

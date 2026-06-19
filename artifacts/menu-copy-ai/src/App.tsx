@@ -30,6 +30,7 @@ function Generator() {
   const [saved, setSaved] = useState<SavedDescription[]>([]);
   const [loadingLibrary, setLoadingLibrary] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [libraryError, setLibraryError] = useState<string | null>(null);
 
@@ -70,6 +71,7 @@ function Generator() {
   const handleSave = async () => {
     if (!result) return;
     setSaving(true);
+    setSaveError(null);
     try {
       const entry = await saveDescription({
         ingredients: currentIngredients,
@@ -80,7 +82,9 @@ function Generator() {
       setResult("");
       setIngredients("");
     } catch (err) {
-      console.error("Save failed:", err);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Save failed:", msg, err);
+      setSaveError(msg);
     } finally {
       setSaving(false);
     }
@@ -205,6 +209,11 @@ function Generator() {
                 <><BookMarked className="w-4 h-4" /> Save to Library</>
               )}
             </Button>
+            {saveError && (
+              <p className="text-xs text-red-400 text-center px-1" data-testid="text-save-error">
+                Save failed: {saveError}
+              </p>
+            )}
           </div>
         )}
 
