@@ -31,7 +31,8 @@ export async function fetchSaved(): Promise<SavedDescription[]> {
   const client = await getClient();
   const { data, error } = await client
     .from("saved_descriptions")
-    .select("*");
+    .select("*")
+    .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];
 }
