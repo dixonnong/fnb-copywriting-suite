@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { PenTool, BookMarked, Trash2, BookOpen } from "lucide-react";
+import { PenTool, BookMarked, Trash2, BookOpen, Copy, Check } from "lucide-react";
 import { fetchSaved, saveDescription, deleteDescription, type SavedDescription } from "@/lib/supabase";
 
 type Tone = "Luxurious" | "Playful" | "Minimalist";
@@ -32,6 +32,7 @@ function Generator() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
   const [libraryError, setLibraryError] = useState<string | null>(null);
 
   const generateMutation = useGenerateDescription();
@@ -88,6 +89,12 @@ function Generator() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCopy = async (id: number, text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const handleDelete = async (id: number) => {
@@ -271,19 +278,33 @@ function Generator() {
                           )}
                         </div>
                       </div>
-                      <button
-                        data-testid={`button-delete-${entry.id}`}
-                        onClick={() => entry.id !== undefined && handleDelete(entry.id)}
-                        disabled={deletingId === entry.id}
-                        className="shrink-0 p-1.5 rounded text-muted-foreground/40 hover:text-red-400 hover:bg-red-400/10 transition-colors disabled:opacity-40"
-                        aria-label="Delete entry"
-                      >
-                        {deletingId === entry.id ? (
-                          <Spinner className="w-4 h-4" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          data-testid={`button-copy-${entry.id}`}
+                          onClick={() => entry.id !== undefined && handleCopy(entry.id, entry.description)}
+                          className="p-1.5 rounded text-muted-foreground/40 hover:text-primary hover:bg-primary/10 transition-colors"
+                          aria-label="Copy description"
+                        >
+                          {copiedId === entry.id ? (
+                            <Check className="w-4 h-4 text-primary" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </button>
+                        <button
+                          data-testid={`button-delete-${entry.id}`}
+                          onClick={() => entry.id !== undefined && handleDelete(entry.id)}
+                          disabled={deletingId === entry.id}
+                          className="p-1.5 rounded text-muted-foreground/40 hover:text-red-400 hover:bg-red-400/10 transition-colors disabled:opacity-40"
+                          aria-label="Delete entry"
+                        >
+                          {deletingId === entry.id ? (
+                            <Spinner className="w-4 h-4" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
