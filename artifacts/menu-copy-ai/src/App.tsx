@@ -6,9 +6,20 @@ import { useState, useEffect, useCallback } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { PenTool, BookMarked, Trash2, BookOpen, Copy, Check } from "lucide-react";
-import { fetchSaved, saveDescription, deleteDescription, type SavedDescription } from "@/lib/supabase";
+import { PenTool, BookMarked, Trash2, BookOpen, Copy, Check, LogOut } from "lucide-react";
+import {
+  fetchSaved,
+  saveDescription,
+  deleteDescription,
+  signIn,
+  signUp,
+  signOut,
+  onAuthStateChange,
+  type SavedDescription,
+  type AuthUser,
+} from "@/lib/supabase";
 
 type Tone = "Luxurious" | "Playful" | "Minimalist";
 const TONES: Tone[] = ["Luxurious", "Playful", "Minimalist"];
@@ -21,7 +32,146 @@ const TONE_COLORS: Record<Tone, string> = {
 
 const queryClient = new QueryClient();
 
-function Generator() {
+// ── Auth Form ────────────────────────────────────────────────────────────────
+
+function AuthForm({ onAuth }: { onAuth: (user: AuthUser) => void }) {
+  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setNotice(null);
+    setLoading(true);
+    try {
+      if (mode === "signup") {
+        const data = await signUp(email, password);
+        if (data.user && !data.session) {
+          setNotice("Check your email to confirm your account, then log in.");
+        } else if (data.user) {
+          onAuth({ id: data.user.id, email: data.user.email });
+        }
+      } else {
+        const data = await signIn(email, password);
+        if (data.user) {
+          onAuth({ id: data.user.id, email: data.user.email });
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Authentication failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+      <div className="w-full max-w-sm flex flex-col gap-8">
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center justify-center p-3 rounded-full bg-primary/10 text-primary mb-2">
+            <PenTool className="w-6 h-6" />
+          </div>
+          <h1 className="text-3xl font-serif text-primary">Menu Copy AI</h1>
+          <p className="text-muted-foreground text-sm uppercase tracking-wide">
+            Consult the master copywriter
+          </p>
+        </div>
+
+        <Card className="bg-card border-border shadow-xl">
+          <CardContent className="p-6 space-y-5">
+            <div className="flex rounded-lg border border-border overflow-hidden">
+              <button
+                data-testid="button-mode-login"
+                onClick={() => { setMode("login"); setError(null); setNotice(null); }}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                  mode === "login"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Log In
+              </button>
+              <button
+                data-testid="button-mode-signup"
+                onClick={() => { setMode("signup"); setError(null); setNotice(null); }}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                  mode === "signup"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Email
+                </label>
+                <Input
+                  data-testid="input-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="bg-background border-border focus-visible:ring-primary"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Password
+                </label>
+                <Input
+                  data-testid="input-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="bg-background border-border focus-visible:ring-primary"
+                />
+              </div>
+
+              {error && (
+                <p className="text-xs text-red-400" data-testid="text-auth-error">{error}</p>
+              )}
+              {notice && (
+                <p className="text-xs text-primary/80" data-testid="text-auth-notice">{notice}</p>
+              )}
+
+              <Button
+                data-testid="button-auth-submit"
+                type="submit"
+                disabled={loading}
+                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Spinner className="w-4 h-4" />
+                    {mode === "login" ? "Logging in..." : "Creating account..."}
+                  </span>
+                ) : (
+                  mode === "login" ? "Log In" : "Sign Up"
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// ── Generator ────────────────────────────────────────────────────────────────
+
+function Generator({ user, onSignOut }: { user: AuthUser; onSignOut: () => void }) {
   const [ingredients, setIngredients] = useState("");
   const [tone, setTone] = useState<Tone>("Luxurious");
   const [result, setResult] = useState("");
@@ -74,17 +224,15 @@ function Generator() {
     setSaving(true);
     setSaveError(null);
     try {
-      const entry = await saveDescription({
-        ingredients: currentIngredients,
-        description: result,
-        tone: currentTone,
-      });
+      const entry = await saveDescription(
+        { ingredients: currentIngredients, description: result, tone: currentTone },
+        user.id
+      );
       setSaved((prev) => [entry, ...prev]);
       setResult("");
       setIngredients("");
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error("Save failed:", msg, err);
       setSaveError(msg);
     } finally {
       setSaving(false);
@@ -128,9 +276,27 @@ function Generator() {
             <PenTool className="w-6 h-6" />
           </div>
           <h1 className="text-3xl font-serif text-primary">Menu Copy AI</h1>
-          <p className="text-muted-foreground text-sm font-sans tracking-wide uppercase">
+          <p className="text-muted-foreground text-sm uppercase tracking-wide">
             Consult the master copywriter
           </p>
+        </div>
+
+        {/* User bar */}
+        <div className="flex items-center justify-between px-1">
+          <span
+            data-testid="text-user-email"
+            className="text-xs text-muted-foreground truncate max-w-[260px]"
+          >
+            {user.email}
+          </span>
+          <button
+            data-testid="button-logout"
+            onClick={onSignOut}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Log out
+          </button>
         </div>
 
         {/* Generator Card */}
@@ -230,7 +396,9 @@ function Generator() {
             <BookOpen className="w-4 h-4" />
             <h2 className="text-xs font-semibold uppercase tracking-wider">Saved Library</h2>
             {!loadingLibrary && (
-              <span className="ml-auto text-xs text-muted-foreground/60">{saved.length} {saved.length === 1 ? "entry" : "entries"}</span>
+              <span className="ml-auto text-xs text-muted-foreground/60">
+                {saved.length} {saved.length === 1 ? "entry" : "entries"}
+              </span>
             )}
           </div>
 
@@ -246,7 +414,9 @@ function Generator() {
             <Card className="bg-card border-border border-dashed">
               <CardContent className="py-10 text-center">
                 <p className="text-muted-foreground text-sm">No saved descriptions yet.</p>
-                <p className="text-muted-foreground/50 text-xs mt-1">Generate a description and save it to your library.</p>
+                <p className="text-muted-foreground/50 text-xs mt-1">
+                  Generate a description and save it to your library.
+                </p>
               </CardContent>
             </Card>
           ) : (
@@ -274,7 +444,9 @@ function Generator() {
                             {entry.tone}
                           </span>
                           {entry.created_at && (
-                            <span className="text-xs text-muted-foreground/50">{formatDate(entry.created_at)}</span>
+                            <span className="text-xs text-muted-foreground/50">
+                              {formatDate(entry.created_at)}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -318,11 +490,52 @@ function Generator() {
   );
 }
 
+// ── Root ─────────────────────────────────────────────────────────────────────
+
+function Root() {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    let subscription: { unsubscribe: () => void } | null = null;
+
+    onAuthStateChange((u) => {
+      setUser(u);
+      setAuthLoading(false);
+    }).then((sub) => {
+      subscription = sub;
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    setUser(null);
+  };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Spinner className="w-6 h-6 text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthForm onAuth={setUser} />;
+  }
+
+  return <Generator user={user} onSignOut={handleSignOut} />;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Generator />
+        <Root />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

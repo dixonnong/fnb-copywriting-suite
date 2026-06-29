@@ -7,9 +7,8 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _client: any = null;
 
-async function getClient() {
+export async function getClient() {
   if (!_client) {
-    // Dynamic import from CDN — satisfies "no npm" requirement
     const { createClient } = await import(
       /* @vite-ignore */
       "https://esm.sh/@supabase/supabase-js@2"
@@ -19,12 +18,75 @@ async function getClient() {
   return _client;
 }
 
+// ── Auth ────────────────────────────────────────────────────────────────────
+
+export interface AuthUser {
+  id: string;
+  email: string;
+}
+
+export async function signUp(email: string, password: string) {
+  const client = await getClient();
+  const { data, error } = await client.auth.signUp({ email, password });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function signIn(email: string, password: string) {
+  const client = await getClient();
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function signOut() {
+  const client = await getClient();
+  const { error } = await client.auth.signOut();
+  if (error) throw new Error(error.message);
+}
+
+export async function getSession() {
+  const client = await getClient();
+  const { data } = await client.auth.getSession();
+  return data.session;
+}
+
+export async function onAuthStateChange(
+  callback: (user: AuthUser | null) => void
+) {
+  const client = await getClient();
+  const { data } = client.auth.onAuthStateChange(
+    (_event: string, session: { user: { id: string; email: string } } | null) => {
+      if (session?.user) {
+        callback({ id: session.user.id, email: session.user.email });
+      } else {
+        callback(null);
+      }
+    }
+  );
+  return data.subscription;
+}
+
+// ── Library ─────────────────────────────────────────────────────────────────
+
 export interface SavedDescription {
   id?: number;
+  user_id?: string;
   ingredients: string;
   description: string;
   tone: string;
   created_at?: string;
+}
+
+function throwSupabaseError(error: {
+  message?: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+}): never {
+  const msg = error.message || error.details || error.code || "Unknown Supabase error";
+  console.error("[Supabase error]", JSON.stringify(error));
+  throw new Error(msg);
 }
 
 export async function fetchSaved(): Promise<SavedDescription[]> {
@@ -37,20 +99,14 @@ export async function fetchSaved(): Promise<SavedDescription[]> {
   return data ?? [];
 }
 
-function throwSupabaseError(error: { message?: string; details?: string; hint?: string; code?: string }): never {
-  const msg = error.message || error.details || error.code || "Unknown Supabase error";
-  console.error("[Supabase error]", JSON.stringify(error));
-  throw new Error(msg);
-}
-
 export async function saveDescription(
-  entry: Omit<SavedDescription, "id" | "created_at">
+  entry: Omit<SavedDescription, "id" | "created_at">,
+  userId: string
 ): Promise<SavedDescription> {
   const client = await getClient();
-  // Insert without .select() first, then fetch separately if needed
   const { data, error } = await client
     .from("saved_descriptions")
-    .insert([entry])
+    .insert([{ ...entry, user_id: userId }])
     .select("*")
     .single();
   if (error) throwSupabaseError(error);
