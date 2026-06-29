@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: generate
     description: AI copy generation operations
+  - name: fnb
+    description: F&B copywriting tools
 paths:
   /healthz:
     get:
@@ -57,6 +59,126 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /fnb/dish:
+    post:
+      operationId: fnbDish
+      tags: [fnb]
+      summary: Generate dish menu description
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FnbDishInput"
+      responses:
+        "200":
+          description: Generated dish description
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FnbTextResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /fnb/social-post:
+    post:
+      operationId: fnbSocialPost
+      tags: [fnb]
+      summary: Generate social media post caption
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FnbSocialInput"
+      responses:
+        "200":
+          description: Generated social post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FnbTextResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /fnb/apology-email:
+    post:
+      operationId: fnbApologyEmail
+      tags: [fnb]
+      summary: Generate customer apology email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FnbApologyInput"
+      responses:
+        "200":
+          description: Generated apology email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FnbTextResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /fnb/job-listing:
+    post:
+      operationId: fnbJobListing
+      tags: [fnb]
+      summary: Generate staff job listing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FnbJobInput"
+      responses:
+        "200":
+          description: Generated job listing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FnbTextResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -88,6 +210,78 @@ components:
         description:
           type: string
           description: The AI-generated cocktail description
+    FnbDishInput:
+      type: object
+      required:
+        - dishName
+        - ingredients
+        - cuisineStyle
+      properties:
+        dishName:
+          type: string
+          minLength: 1
+        ingredients:
+          type: string
+          minLength: 1
+        cuisineStyle:
+          type: string
+          minLength: 1
+    FnbSocialInput:
+      type: object
+      required:
+        - promotion
+        - platform
+        - tone
+      properties:
+        promotion:
+          type: string
+          minLength: 1
+        platform:
+          type: string
+          enum: [Instagram, Facebook]
+        tone:
+          type: string
+          enum: [Exciting, Elegant, Casual]
+    FnbApologyInput:
+      type: object
+      required:
+        - whatWentWrong
+        - customerName
+        - reservationDetails
+      properties:
+        whatWentWrong:
+          type: string
+          minLength: 1
+        customerName:
+          type: string
+          minLength: 1
+        reservationDetails:
+          type: string
+          minLength: 1
+    FnbJobInput:
+      type: object
+      required:
+        - role
+        - venueType
+        - requirements
+      properties:
+        role:
+          type: string
+          minLength: 1
+        venueType:
+          type: string
+          minLength: 1
+        requirements:
+          type: string
+          minLength: 1
+    FnbTextResult:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: The AI-generated copy
     ErrorResponse:
       type: object
       required:

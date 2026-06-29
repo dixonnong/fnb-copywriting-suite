@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/fnb-copy-suite/"
+title = "F&B Copywriting Suite"
+version = "1.0.0"
+id = "artifacts/fnb-copy-suite"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/fnb-copy-suite/" ]
+localPort = 21061
+
+[services.development]
+run = "pnpm --filter @workspace/fnb-copy-suite run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/fnb-copy-suite", "run", "build" ]
+publicDir = "artifacts/fnb-copy-suite/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21061"
+BASE_PATH = "/fnb-copy-suite/"

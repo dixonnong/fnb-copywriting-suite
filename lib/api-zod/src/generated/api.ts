@@ -34,3 +34,77 @@ export const GenerateDescriptionResponse = zod.object({
 })
 
 
+/**
+ * @summary Generate dish menu description
+ */
+
+
+
+
+
+export const FnbDishBody = zod.object({
+  "dishName": zod.string().min(1),
+  "ingredients": zod.string().min(1),
+  "cuisineStyle": zod.string().min(1)
+})
+
+export const FnbDishResponse = zod.object({
+  "text": zod.string().describe('The AI-generated copy')
+})
+
+
+/**
+ * @summary Generate social media post caption
+ */
+
+
+
+export const FnbSocialPostBody = zod.object({
+  "promotion": zod.string().min(1),
+  "platform": zod.enum(['Instagram', 'Facebook']),
+  "tone": zod.enum(['Exciting', 'Elegant', 'Casual'])
+})
+
+export const FnbSocialPostResponse = zod.object({
+  "text": zod.string().describe('The AI-generated copy')
+})
+
+
+/**
+ * @summary Generate customer apology email
+ */
+
+
+
+
+
+export const FnbApologyEmailBody = zod.object({
+  "whatWentWrong": zod.string().min(1),
+  "customerName": zod.string().min(1),
+  "reservationDetails": zod.string().min(1)
+})
+
+export const FnbApologyEmailResponse = zod.object({
+  "text": zod.string().describe('The AI-generated copy')
+})
+
+
+/**
+ * @summary Generate staff job listing
+ */
+
+
+
+
+
+export const FnbJobListingBody = zod.object({
+  "role": zod.string().min(1),
+  "venueType": zod.string().min(1),
+  "requirements": zod.string().min(1)
+})
+
+export const FnbJobListingResponse = zod.object({
+  "text": zod.string().describe('The AI-generated copy')
+})
+
+

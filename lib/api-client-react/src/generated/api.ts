@@ -23,6 +23,11 @@ import type {
   DescriptionInput,
   DescriptionResult,
   ErrorResponse,
+  FnbApologyInput,
+  FnbDishInput,
+  FnbJobInput,
+  FnbSocialInput,
+  FnbTextResult,
   HealthStatus
 } from './api.schemas';
 
@@ -186,5 +191,289 @@ export const useGenerateDescription = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getGenerateDescriptionMutationOptions(options));
+    }
+
+export const getFnbDishUrl = () => {
+
+
+
+
+  return `/api/fnb/dish`
+}
+
+/**
+ * @summary Generate dish menu description
+ */
+export const fnbDish = async (fnbDishInput: FnbDishInput, options?: RequestInit): Promise<FnbTextResult> => {
+
+  return customFetch<FnbTextResult>(getFnbDishUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      fnbDishInput,)
+  }
+);}
+
+
+
+
+export const getFnbDishMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fnbDish>>, TError,{data: BodyType<FnbDishInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof fnbDish>>, TError,{data: BodyType<FnbDishInput>}, TContext> => {
+
+const mutationKey = ['fnbDish'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof fnbDish>>, {data: BodyType<FnbDishInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  fnbDish(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FnbDishMutationResult = NonNullable<Awaited<ReturnType<typeof fnbDish>>>
+    export type FnbDishMutationBody = BodyType<FnbDishInput>
+    export type FnbDishMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Generate dish menu description
+ */
+export const useFnbDish = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fnbDish>>, TError,{data: BodyType<FnbDishInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof fnbDish>>,
+        TError,
+        {data: BodyType<FnbDishInput>},
+        TContext
+      > => {
+      return useMutation(getFnbDishMutationOptions(options));
+    }
+
+export const getFnbSocialPostUrl = () => {
+
+
+
+
+  return `/api/fnb/social-post`
+}
+
+/**
+ * @summary Generate social media post caption
+ */
+export const fnbSocialPost = async (fnbSocialInput: FnbSocialInput, options?: RequestInit): Promise<FnbTextResult> => {
+
+  return customFetch<FnbTextResult>(getFnbSocialPostUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      fnbSocialInput,)
+  }
+);}
+
+
+
+
+export const getFnbSocialPostMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fnbSocialPost>>, TError,{data: BodyType<FnbSocialInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof fnbSocialPost>>, TError,{data: BodyType<FnbSocialInput>}, TContext> => {
+
+const mutationKey = ['fnbSocialPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof fnbSocialPost>>, {data: BodyType<FnbSocialInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  fnbSocialPost(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FnbSocialPostMutationResult = NonNullable<Awaited<ReturnType<typeof fnbSocialPost>>>
+    export type FnbSocialPostMutationBody = BodyType<FnbSocialInput>
+    export type FnbSocialPostMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Generate social media post caption
+ */
+export const useFnbSocialPost = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fnbSocialPost>>, TError,{data: BodyType<FnbSocialInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof fnbSocialPost>>,
+        TError,
+        {data: BodyType<FnbSocialInput>},
+        TContext
+      > => {
+      return useMutation(getFnbSocialPostMutationOptions(options));
+    }
+
+export const getFnbApologyEmailUrl = () => {
+
+
+
+
+  return `/api/fnb/apology-email`
+}
+
+/**
+ * @summary Generate customer apology email
+ */
+export const fnbApologyEmail = async (fnbApologyInput: FnbApologyInput, options?: RequestInit): Promise<FnbTextResult> => {
+
+  return customFetch<FnbTextResult>(getFnbApologyEmailUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      fnbApologyInput,)
+  }
+);}
+
+
+
+
+export const getFnbApologyEmailMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fnbApologyEmail>>, TError,{data: BodyType<FnbApologyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof fnbApologyEmail>>, TError,{data: BodyType<FnbApologyInput>}, TContext> => {
+
+const mutationKey = ['fnbApologyEmail'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof fnbApologyEmail>>, {data: BodyType<FnbApologyInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  fnbApologyEmail(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FnbApologyEmailMutationResult = NonNullable<Awaited<ReturnType<typeof fnbApologyEmail>>>
+    export type FnbApologyEmailMutationBody = BodyType<FnbApologyInput>
+    export type FnbApologyEmailMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Generate customer apology email
+ */
+export const useFnbApologyEmail = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fnbApologyEmail>>, TError,{data: BodyType<FnbApologyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof fnbApologyEmail>>,
+        TError,
+        {data: BodyType<FnbApologyInput>},
+        TContext
+      > => {
+      return useMutation(getFnbApologyEmailMutationOptions(options));
+    }
+
+export const getFnbJobListingUrl = () => {
+
+
+
+
+  return `/api/fnb/job-listing`
+}
+
+/**
+ * @summary Generate staff job listing
+ */
+export const fnbJobListing = async (fnbJobInput: FnbJobInput, options?: RequestInit): Promise<FnbTextResult> => {
+
+  return customFetch<FnbTextResult>(getFnbJobListingUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      fnbJobInput,)
+  }
+);}
+
+
+
+
+export const getFnbJobListingMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fnbJobListing>>, TError,{data: BodyType<FnbJobInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof fnbJobListing>>, TError,{data: BodyType<FnbJobInput>}, TContext> => {
+
+const mutationKey = ['fnbJobListing'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof fnbJobListing>>, {data: BodyType<FnbJobInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  fnbJobListing(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FnbJobListingMutationResult = NonNullable<Awaited<ReturnType<typeof fnbJobListing>>>
+    export type FnbJobListingMutationBody = BodyType<FnbJobInput>
+    export type FnbJobListingMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Generate staff job listing
+ */
+export const useFnbJobListing = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fnbJobListing>>, TError,{data: BodyType<FnbJobInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof fnbJobListing>>,
+        TError,
+        {data: BodyType<FnbJobInput>},
+        TContext
+      > => {
+      return useMutation(getFnbJobListingMutationOptions(options));
     }
 

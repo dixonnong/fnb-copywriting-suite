@@ -36,6 +36,62 @@ export interface DescriptionResult {
   description: string;
 }
 
+export interface FnbDishInput {
+  /** @minLength 1 */
+  dishName: string;
+  /** @minLength 1 */
+  ingredients: string;
+  /** @minLength 1 */
+  cuisineStyle: string;
+}
+
+export type FnbSocialInputPlatform = typeof FnbSocialInputPlatform[keyof typeof FnbSocialInputPlatform];
+
+
+export const FnbSocialInputPlatform = {
+  Instagram: 'Instagram',
+  Facebook: 'Facebook',
+} as const;
+
+export type FnbSocialInputTone = typeof FnbSocialInputTone[keyof typeof FnbSocialInputTone];
+
+
+export const FnbSocialInputTone = {
+  Exciting: 'Exciting',
+  Elegant: 'Elegant',
+  Casual: 'Casual',
+} as const;
+
+export interface FnbSocialInput {
+  /** @minLength 1 */
+  promotion: string;
+  platform: FnbSocialInputPlatform;
+  tone: FnbSocialInputTone;
+}
+
+export interface FnbApologyInput {
+  /** @minLength 1 */
+  whatWentWrong: string;
+  /** @minLength 1 */
+  customerName: string;
+  /** @minLength 1 */
+  reservationDetails: string;
+}
+
+export interface FnbJobInput {
+  /** @minLength 1 */
+  role: string;
+  /** @minLength 1 */
+  venueType: string;
+  /** @minLength 1 */
+  requirements: string;
+}
+
+export interface FnbTextResult {
+  /** The AI-generated copy */
+  text: string;
+}
+
 export interface ErrorResponse {
   error: string;
 }
