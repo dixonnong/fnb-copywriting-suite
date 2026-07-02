@@ -50,9 +50,10 @@ export async function onAuthStateChange(
       callback(null);
     }
   });
-  
-  // Initial state call
-  const { data: { session } } = await client.auth.getSession();
+
+  const {
+    data: { session },
+  } = await client.auth.getSession();
   if (session?.user) {
     callback({ id: session.user.id, email: session.user.email });
   } else {
@@ -62,4 +63,29 @@ export async function onAuthStateChange(
   return () => {
     data.subscription.unsubscribe();
   };
+}
+
+export async function getSession() {
+  const client = await getClient();
+  const {
+    data: { session },
+  } = await client.auth.getSession();
+  return session;
+}
+
+export async function getProfile(
+  userId: string
+): Promise<{ subscription_status: string } | null> {
+  const client = await getClient();
+  const { data, error } = await client
+    .from("profiles")
+    .select("subscription_status")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    // Profile may not exist yet (new user, or table not yet set up)
+    return null;
+  }
+  return data;
 }

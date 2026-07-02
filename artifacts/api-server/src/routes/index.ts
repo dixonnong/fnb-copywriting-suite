@@ -5,6 +5,7 @@ import dishRouter from "./fnb/dish";
 import socialPostRouter from "./fnb/social-post";
 import apologyEmailRouter from "./fnb/apology-email";
 import jobListingRouter from "./fnb/job-listing";
+import checkoutRouter from "./fnb/checkout";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use("/fnb/dish", dishRouter);
 router.use("/fnb/social-post", socialPostRouter);
 router.use("/fnb/apology-email", apologyEmailRouter);
 router.use("/fnb/job-listing", jobListingRouter);
+router.use("/fnb/checkout", checkoutRouter);
 
 export default router;
