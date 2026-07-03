@@ -41,6 +41,7 @@ externalPort = 3000
 [userenv.shared]
 VITE_SUPABASE_URL = "https://dqylluelwztqyvhrrsfd.supabase.co"
 VITE_SUPABASE_ANON_KEY = "sb_publishable_Y6G9mJmw3_atjR-L7LWAjw_sydA0eSD"
+STRIPE_PRICE_ID = "price_1TnxzGCuGx6OPe8GDESO07Kw"
 
 [nix]
 channel = "stable-25_05"

@@ -3,7 +3,8 @@ import { getStripeClient } from "../../stripe-client";
 
 const router = Router();
 
-const PRICE_ID = "price_1TnxzGCuGx6OPe8GDESO07Kw";
+const PRICE_ID = process.env.STRIPE_PRICE_ID;
+if (!PRICE_ID) throw new Error("STRIPE_PRICE_ID is not configured. Add it as a Replit environment variable.");
 
 router.post("/", async (req, res) => {
   const authHeader = req.headers.authorization;
