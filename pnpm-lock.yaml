@@ -424,6 +424,10 @@ importers:
         version: 3.25.76
 
   artifacts/menu-copy-ai:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.110.0
+        version: 2.110.0
     devDependencies:
       '@hookform/resolvers':
         specifier: ^3.10.0

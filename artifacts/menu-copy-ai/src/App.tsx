@@ -53,12 +53,12 @@ function AuthForm({ onAuth }: { onAuth: (user: AuthUser) => void }) {
         if (data.user && !data.session) {
           setNotice("Check your email to confirm your account, then log in.");
         } else if (data.user) {
-          onAuth({ id: data.user.id, email: data.user.email });
+          onAuth({ id: data.user.id, email: data.user.email ?? "" });
         }
       } else {
         const data = await signIn(email, password);
         if (data.user) {
-          onAuth({ id: data.user.id, email: data.user.email });
+          onAuth({ id: data.user.id, email: data.user.email ?? "" });
         }
       }
     } catch (err) {

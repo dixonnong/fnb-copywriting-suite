@@ -12,35 +12,44 @@ export function getClient(): SupabaseClient {
   return _client;
 }
 
+// ── Auth ────────────────────────────────────────────────────────────────────
+
 export interface AuthUser {
   id: string;
   email: string;
 }
 
 export async function signUp(email: string, password: string) {
-  const { data, error } = await getClient().auth.signUp({ email, password });
+  const client = getClient();
+  const { data, error } = await client.auth.signUp({ email, password });
   if (error) throw new Error(error.message);
   return data;
 }
 
 export async function signIn(email: string, password: string) {
-  const { data, error } = await getClient().auth.signInWithPassword({ email, password });
+  const client = getClient();
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
   if (error) throw new Error(error.message);
   return data;
 }
 
 export async function signOut() {
-  const { error } = await getClient().auth.signOut();
+  const client = getClient();
+  const { error } = await client.auth.signOut();
   if (error) throw new Error(error.message);
 }
 
 export async function getSession() {
-  const { data } = await getClient().auth.getSession();
+  const client = getClient();
+  const { data } = await client.auth.getSession();
   return data.session;
 }
 
-export function onAuthStateChange(callback: (user: AuthUser | null) => void) {
-  const { data } = getClient().auth.onAuthStateChange((_event, session) => {
+export async function onAuthStateChange(
+  callback: (user: AuthUser | null) => void
+) {
+  const client = getClient();
+  const { data } = client.auth.onAuthStateChange((_event, session) => {
     if (session?.user) {
       callback({ id: session.user.id, email: session.user.email ?? "" });
     } else {
@@ -49,6 +58,8 @@ export function onAuthStateChange(callback: (user: AuthUser | null) => void) {
   });
   return data.subscription;
 }
+
+// ── Library ─────────────────────────────────────────────────────────────────
 
 export interface SavedDescription {
   id?: number;
@@ -71,7 +82,8 @@ function throwSupabaseError(error: {
 }
 
 export async function fetchSaved(): Promise<SavedDescription[]> {
-  const { data, error } = await getClient()
+  const client = getClient();
+  const { data, error } = await client
     .from("saved_descriptions")
     .select("*")
     .order("created_at", { ascending: false });
@@ -83,7 +95,8 @@ export async function saveDescription(
   entry: Omit<SavedDescription, "id" | "created_at">,
   userId: string
 ): Promise<SavedDescription> {
-  const { data, error } = await getClient()
+  const client = getClient();
+  const { data, error } = await client
     .from("saved_descriptions")
     .insert([{ ...entry, user_id: userId }])
     .select("*")
@@ -93,7 +106,8 @@ export async function saveDescription(
 }
 
 export async function deleteDescription(id: number): Promise<void> {
-  const { error } = await getClient()
+  const client = getClient();
+  const { error } = await client
     .from("saved_descriptions")
     .delete()
     .eq("id", id);
