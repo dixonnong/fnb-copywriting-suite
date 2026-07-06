@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import { getStripeClient } from "../../stripe-client";
 
 interface SupabaseUser {
@@ -8,23 +8,26 @@ interface SupabaseUser {
 
 const router = Router();
 
-router.post("/", async (req, res) => {
+router.post("/", async (req: Request, res: Response): Promise<void> => {
   const priceId = process.env.STRIPE_PRICE_ID;
   if (!priceId) {
-    return res.status(500).json({ error: "STRIPE_PRICE_ID is not configured." });
+    res.status(500).json({ error: "STRIPE_PRICE_ID is not configured." });
+    return;
   }
 
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Unauthorized" });
+    res.status(401).json({ error: "Unauthorized" });
+    return;
   }
-  const token = authHeader.slice(7);
 
+  const token = authHeader.slice(7);
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return res.status(500).json({ error: "Supabase not configured" });
+    res.status(500).json({ error: "Supabase not configured" });
+    return;
   }
 
   const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
@@ -35,13 +38,15 @@ router.post("/", async (req, res) => {
   });
 
   if (!userRes.ok) {
-    return res.status(401).json({ error: "Invalid session" });
+    res.status(401).json({ error: "Invalid session" });
+    return;
   }
 
   const user = (await userRes.json()) as SupabaseUser;
 
   if (!user?.email) {
-    return res.status(400).json({ error: "Could not determine user email" });
+    res.status(400).json({ error: "Could not determine user email" });
+    return;
   }
 
   const stripe = getStripeClient();
@@ -63,7 +68,7 @@ router.post("/", async (req, res) => {
     },
   });
 
-  return res.json({ url: session.url });
+  res.json({ url: session.url });
 });
 
 export default router;
