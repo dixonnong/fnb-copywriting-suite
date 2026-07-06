@@ -1,12 +1,19 @@
 import { Router } from "express";
 import { getStripeClient } from "../../stripe-client";
 
+interface SupabaseUser {
+  id: string;
+  email: string;
+}
+
 const router = Router();
 
-const PRICE_ID = process.env.STRIPE_PRICE_ID;
-if (!PRICE_ID) throw new Error("STRIPE_PRICE_ID is not configured. Add it as a Replit environment variable.");
-
 router.post("/", async (req, res) => {
+  const priceId = process.env.STRIPE_PRICE_ID;
+  if (!priceId) {
+    return res.status(500).json({ error: "STRIPE_PRICE_ID is not configured." });
+  }
+
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Unauthorized" });
@@ -31,7 +38,7 @@ router.post("/", async (req, res) => {
     return res.status(401).json({ error: "Invalid session" });
   }
 
-  const user = await userRes.json();
+  const user = (await userRes.json()) as SupabaseUser;
 
   if (!user?.email) {
     return res.status(400).json({ error: "Could not determine user email" });
@@ -46,7 +53,7 @@ router.post("/", async (req, res) => {
   const session = await stripe.checkout.sessions.create({
     customer_email: user.email,
     payment_method_types: ["card"],
-    line_items: [{ price: PRICE_ID, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }],
     mode: "subscription",
     success_url: `${appBase}/?subscribed=true`,
     cancel_url: `${appBase}/`,
@@ -56,7 +63,7 @@ router.post("/", async (req, res) => {
     },
   });
 
-  res.json({ url: session.url });
+  return res.json({ url: session.url });
 });
 
 export default router;
