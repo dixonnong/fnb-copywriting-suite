@@ -1,24 +1,16 @@
-// Supabase loaded from CDN at runtime — no npm package
-// Using dynamic ESM import from esm.sh CDN
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _client: any = null;
+let _client: SupabaseClient | null = null;
 
-export async function getClient() {
+export function getClient(): SupabaseClient {
   if (!_client) {
-    const { createClient } = await import(
-      /* @vite-ignore */
-      "https://esm.sh/@supabase/supabase-js@2"
-    );
     _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
   return _client;
 }
-
-// ── Auth ────────────────────────────────────────────────────────────────────
 
 export interface AuthUser {
   id: string;
@@ -26,48 +18,37 @@ export interface AuthUser {
 }
 
 export async function signUp(email: string, password: string) {
-  const client = await getClient();
-  const { data, error } = await client.auth.signUp({ email, password });
+  const { data, error } = await getClient().auth.signUp({ email, password });
   if (error) throw new Error(error.message);
   return data;
 }
 
 export async function signIn(email: string, password: string) {
-  const client = await getClient();
-  const { data, error } = await client.auth.signInWithPassword({ email, password });
+  const { data, error } = await getClient().auth.signInWithPassword({ email, password });
   if (error) throw new Error(error.message);
   return data;
 }
 
 export async function signOut() {
-  const client = await getClient();
-  const { error } = await client.auth.signOut();
+  const { error } = await getClient().auth.signOut();
   if (error) throw new Error(error.message);
 }
 
 export async function getSession() {
-  const client = await getClient();
-  const { data } = await client.auth.getSession();
+  const { data } = await getClient().auth.getSession();
   return data.session;
 }
 
-export async function onAuthStateChange(
-  callback: (user: AuthUser | null) => void
-) {
-  const client = await getClient();
-  const { data } = client.auth.onAuthStateChange(
-    (_event: string, session: { user: { id: string; email: string } } | null) => {
-      if (session?.user) {
-        callback({ id: session.user.id, email: session.user.email });
-      } else {
-        callback(null);
-      }
+export function onAuthStateChange(callback: (user: AuthUser | null) => void) {
+  const { data } = getClient().auth.onAuthStateChange((_event, session) => {
+    if (session?.user) {
+      callback({ id: session.user.id, email: session.user.email ?? "" });
+    } else {
+      callback(null);
     }
-  );
+  });
   return data.subscription;
 }
-
-// ── Library ─────────────────────────────────────────────────────────────────
 
 export interface SavedDescription {
   id?: number;
@@ -90,8 +71,7 @@ function throwSupabaseError(error: {
 }
 
 export async function fetchSaved(): Promise<SavedDescription[]> {
-  const client = await getClient();
-  const { data, error } = await client
+  const { data, error } = await getClient()
     .from("saved_descriptions")
     .select("*")
     .order("created_at", { ascending: false });
@@ -103,8 +83,7 @@ export async function saveDescription(
   entry: Omit<SavedDescription, "id" | "created_at">,
   userId: string
 ): Promise<SavedDescription> {
-  const client = await getClient();
-  const { data, error } = await client
+  const { data, error } = await getClient()
     .from("saved_descriptions")
     .insert([{ ...entry, user_id: userId }])
     .select("*")
@@ -114,8 +93,7 @@ export async function saveDescription(
 }
 
 export async function deleteDescription(id: number): Promise<void> {
-  const client = await getClient();
-  const { error } = await client
+  const { error } = await getClient()
     .from("saved_descriptions")
     .delete()
     .eq("id", id);
