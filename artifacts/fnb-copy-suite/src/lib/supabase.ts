@@ -31,16 +31,18 @@ export async function getSession(): Promise<Session | null> {
   return data.session;
 }
 
-export async function getProfile(user: User) {
-  return supabase
+export async function getProfile(userId: string) {
+  const { data } = await supabase
     .from("users")
     .select("*")
-    .eq("id", user.id)
+    .eq("id", userId)
     .single();
+  return data;
 }
 
-export function onAuthStateChange(callback: (user: User | null) => void) {
-  return supabase.auth.onAuthStateChange((_event, session) => {
+export function onAuthStateChange(callback: (user: User | null) => void): Promise<() => void> {
+  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
     callback(session?.user ?? null);
   });
+  return Promise.resolve(data.subscription.unsubscribe.bind(data.subscription));
 }
