@@ -183,7 +183,7 @@ function AppContent() {
       <main className="flex-1 w-full max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
         {!isPro ? (
           <PricingPage
-            userEmail={user.email}
+            userEmail={user.email ?? ""}
             onSubscribe={handleSubscribe}
             isLoading={checkoutLoading}
             pollingForPro={pollingForPro}
