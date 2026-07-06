@@ -20,7 +20,7 @@ const queryClient = new QueryClient();
 type SubscriptionStatus = "loading" | "free" | "pro";
 
 function AppContent() {
-  const [user, setUser] = useState<{ id: string; email? string } | null | undefined>(undefined);
+  const [user, setUser] = useState<{ id: string; email?: string } | null | undefined>(undefined);
   const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>("loading");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [pollingForPro, setPollingForPro] = useState(false);
