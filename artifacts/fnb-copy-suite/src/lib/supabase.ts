@@ -1,10 +1,9 @@
-export let _client: any = null;
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-export async function getClient() {
+let _client: SupabaseClient | null = null;
+
+export function getClient(): SupabaseClient {
   if (!_client) {
-    const { createClient } = await import(
-      /* @vite-ignore */ "https://esm.sh/@supabase/supabase-js@2"
-    );
     _client = createClient(
       import.meta.env.VITE_SUPABASE_URL,
       import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -14,7 +13,7 @@ export async function getClient() {
 }
 
 export async function signIn(email: string, password: string) {
-  const client = await getClient();
+  const client = getClient();
   const { data, error } = await client.auth.signInWithPassword({
     email,
     password,
@@ -24,7 +23,7 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signUp(email: string, password: string) {
-  const client = await getClient();
+  const client = getClient();
   const { data, error } = await client.auth.signUp({
     email,
     password,
@@ -34,7 +33,7 @@ export async function signUp(email: string, password: string) {
 }
 
 export async function signOut() {
-  const client = await getClient();
+  const client = getClient();
   const { error } = await client.auth.signOut();
   if (error) throw error;
 }
@@ -42,10 +41,10 @@ export async function signOut() {
 export async function onAuthStateChange(
   callback: (user: { id: string; email: string } | null) => void
 ) {
-  const client = await getClient();
-  const { data } = client.auth.onAuthStateChange((event: any, session: any) => {
+  const client = getClient();
+  const { data } = client.auth.onAuthStateChange((_event, session) => {
     if (session?.user) {
-      callback({ id: session.user.id, email: session.user.email });
+      callback({ id: session.user.id, email: session.user.email ?? "" });
     } else {
       callback(null);
     }
@@ -55,7 +54,7 @@ export async function onAuthStateChange(
     data: { session },
   } = await client.auth.getSession();
   if (session?.user) {
-    callback({ id: session.user.id, email: session.user.email });
+    callback({ id: session.user.id, email: session.user.email ?? "" });
   } else {
     callback(null);
   }
@@ -66,7 +65,7 @@ export async function onAuthStateChange(
 }
 
 export async function getSession() {
-  const client = await getClient();
+  const client = getClient();
   const {
     data: { session },
   } = await client.auth.getSession();
@@ -76,7 +75,7 @@ export async function getSession() {
 export async function getProfile(
   userId: string
 ): Promise<{ subscription_status: string } | null> {
-  const client = await getClient();
+  const client = getClient();
   const { data, error } = await client
     .from("profiles")
     .select("subscription_status")
@@ -84,7 +83,6 @@ export async function getProfile(
     .single();
 
   if (error) {
-    // Profile may not exist yet (new user, or table not yet set up)
     return null;
   }
   return data;
