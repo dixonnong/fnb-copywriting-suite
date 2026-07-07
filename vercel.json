@@ -1,23 +1,5 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "artifacts/api-server/dist/index.mjs",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "artifacts/fnb-copy-suite/dist/public/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "artifacts/api-server/dist/index.mjs"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "artifacts/fnb-copy-suite/dist/public/index.html"
-    }
-  ]
+  "buildCommand": "pnpm --filter @workspace/fnb-copy-suite build",
+  "outputDirectory": "artifacts/fnb-copy-suite/dist",
+  "installCommand": "pnpm install"
 }
