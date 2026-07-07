@@ -1,5 +1,8 @@
 {
-  "buildCommand": "pnpm --filter @workspace/fnb-copy-suite build",
-  "outputDirectory": "artifacts/fnb-copy-suite/dist",
-  "installCommand": "pnpm install"
+  "buildCommand": "pnpm run build",
+  "outputDirectory": "artifacts/fnb-copy-suite/dist/public",
+  "installCommand": "pnpm install",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
