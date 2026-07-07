@@ -1,0 +1,5 @@
+{
+  "buildCommand": "pnpm --filter @workspace/fnb-copy-suite build",
+  "outputDirectory": "artifacts/fnb-copy-suite/dist",
+  "installCommand": "pnpm install"
+}
