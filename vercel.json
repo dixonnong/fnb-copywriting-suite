@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/artifacts/api-server/dist/index.mjs" },
+    { "source": "/fnb-copy-suite/(.*)", "destination": "/artifacts/fnb-copy-suite/dist/public/index.html" },
+    { "source": "/(.*)", "destination": "/artifacts/fnb-copy-suite/dist/public/index.html" }
+  ],
+  "outputDirectory": "artifacts/fnb-copy-suite/dist/public"
+}
