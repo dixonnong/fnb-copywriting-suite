@@ -1,8 +1,23 @@
 {
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/artifacts/api-server/dist/index.mjs" },
-    { "source": "/fnb-copy-suite/(.*)", "destination": "/artifacts/fnb-copy-suite/dist/public/index.html" },
-    { "source": "/(.*)", "destination": "/artifacts/fnb-copy-suite/dist/public/index.html" }
+  "version": 2,
+  "builds": [
+    {
+      "src": "artifacts/api-server/dist/index.mjs",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "artifacts/fnb-copy-suite/dist/public/**",
+      "use": "@vercel/static"
+    }
   ],
-  "outputDirectory": "artifacts/fnb-copy-suite/dist/public"
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "artifacts/api-server/dist/index.mjs"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "artifacts/fnb-copy-suite/dist/public/index.html"
+    }
+  ]
 }
