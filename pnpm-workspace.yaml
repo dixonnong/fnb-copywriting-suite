@@ -35,7 +35,9 @@ minimumReleaseAgeExclude:
   - stripe-replit-sync
 
 packages:
-  - artifacts/*
+  - artifacts/api-server
+  - artifacts/fnb-copy-suite
+  - artifacts/menu-copy-ai
   - lib/*
   - lib/integrations/*
   - scripts
