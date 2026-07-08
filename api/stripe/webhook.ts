@@ -49,7 +49,7 @@ export default async function handler(req: any, res: any) {
         console.error("SUPABASE_SERVICE_ROLE_KEY not configured");
       } else {
         try {
-          const updateRes = await fetch(`${supabaseUrl}/rest/v1/profiles`, {
+          const updateRes = await fetch(`${supabaseUrl}/rest/v1/users`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

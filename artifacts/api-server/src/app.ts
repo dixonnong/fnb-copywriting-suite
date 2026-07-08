@@ -78,7 +78,7 @@ app.post(
         } else {
           try {
             // Upsert profile: inserts if new user, updates if existing
-            const updateRes = await fetch(`${supabaseUrl}/rest/v1/profiles`, {
+            const updateRes = await fetch(`${supabaseUrl}/rest/v1/users`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
